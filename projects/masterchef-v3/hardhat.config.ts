@@ -14,6 +14,12 @@ import "dotenv/config";
 
 require("dotenv").config({ path: require("find-config")(".env") });
 
+const fraxTestnet: NetworkUserConfig = {
+  url: 'https://rpc.testnet.frax.com',
+  chainId: 2522,
+  accounts: [process.env.KEY_FRAX_TESTNET!],
+};
+
 const bscTestnet: NetworkUserConfig = {
   url: "https://data-seed-prebsc-1-s1.binance.org:8545/",
   chainId: 97,
@@ -42,6 +48,7 @@ const config = {
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {},
+    ...(process.env.KEY_FRAX_TESTNET && { fraxTestnet }),
     ...(process.env.KEY_TESTNET && { bscTestnet }),
     ...(process.env.KEY_MAINNET && { bscMainnet }),
     ...(process.env.KEY_GOERLI && { goerli }),
@@ -50,7 +57,20 @@ const config = {
     // mainnet: bscMainnet,
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: {
+      mainnet: process.env.ETHERSCAN_API_KEY || '',
+      fraxTestnet: process.env.ETHERSCAN_API_KEY || '',
+    },
+    customChains: [
+      {
+        network: 'fraxTestnet',
+        chainId: 2522,
+        urls: {
+          apiURL: "https://api-holesky.fraxscan.com/api",
+          browserURL: "https://holesky.fraxscan.com",
+        },
+      },
+    ],
   },
   solidity: {
     compilers: [

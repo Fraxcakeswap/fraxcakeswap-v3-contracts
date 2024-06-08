@@ -7,6 +7,7 @@ const networks = {
   bscMainnet: 'bscMainnet',
   bscTestnet: 'bscTestnet',
   hardhat: 'hardhat',
+  fraxTestnet: 'fraxTestnet',
 }
 
 let network = process.env.NETWORK
