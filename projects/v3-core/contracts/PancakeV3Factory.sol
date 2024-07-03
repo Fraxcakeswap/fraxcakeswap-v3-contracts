@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-pragma solidity =0.7.6;
+pragma solidity ^0.8.19;
 
-import './interfaces/IPancakeV3Factory.sol';
-import "./interfaces/IPancakeV3PoolDeployer.sol";
-import './interfaces/IPancakeV3Pool.sol';
+import './v8/interfaces/IPancakeV3Factory.sol';
+import "./v8/interfaces/IPancakeV3PoolDeployer.sol";
+import './v8/interfaces/IPancakeV3Pool.sol';
+import './v8/interfaces/ISwapFee.sol';
 
 /// @title Canonical PancakeSwap V3 factory
 /// @notice Deploys PancakeSwap V3 pools and manages ownership and control over pool protocol fees
@@ -11,7 +12,9 @@ contract PancakeV3Factory is IPancakeV3Factory {
     /// @inheritdoc IPancakeV3Factory
     address public override owner;
 
-    address public immutable poolDeployer;
+    address public poolDeployer;
+
+    address private _swapFee;
 
     /// @inheritdoc IPancakeV3Factory
     mapping(uint24 => int24) public override feeAmountTickSpacing;
@@ -22,6 +25,8 @@ contract PancakeV3Factory is IPancakeV3Factory {
     mapping(address => bool) private _whiteListAddresses;
 
     address public lmPoolDeployer;
+
+    event SetPoolDeployer(address indexed poolDeployer);
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Not owner");
@@ -126,6 +131,23 @@ contract PancakeV3Factory is IPancakeV3Factory {
     function setLmPoolDeployer(address _lmPoolDeployer) external override onlyOwner {
         lmPoolDeployer = _lmPoolDeployer;
         emit SetLmPoolDeployer(_lmPoolDeployer);
+    }
+
+    function setPoolDeployer(address _poolDeployer) external onlyOwner {
+        poolDeployer = _poolDeployer;
+        emit SetPoolDeployer(_poolDeployer);
+    }
+
+    function setSwapFee(address swapFee) external onlyOwner {
+        _swapFee = swapFee;
+    }
+
+    function getSwapFee(address sender, uint24 fee) external returns (uint24) {       
+        if(_swapFee == address(0)) {
+            return fee;
+        }
+
+        return ISwapFee(_swapFee).swapFee(sender, fee);
     }
 
     function setFeeProtocol(address pool, uint32 feeProtocol0, uint32 feeProtocol1) external override onlyOwner {

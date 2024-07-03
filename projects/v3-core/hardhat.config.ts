@@ -28,6 +28,20 @@ const LOWEST_OPTIMIZER_COMPILER_SETTINGS = {
     evmVersion: 'istanbul',
     optimizer: {
       enabled: true,
+      runs: 800,
+    },
+    metadata: {
+      bytecodeHash: 'none',
+    },
+  },
+}
+
+const LOWEST_8_OPTIMIZER_COMPILER_SETTINGS = {
+  version: '0.8.19',
+  settings: {
+    viaIR: true,
+    optimizer: {
+      enabled: true,
       runs: 400,
     },
     metadata: {
@@ -40,6 +54,19 @@ const DEFAULT_COMPILER_SETTINGS = {
   version: '0.7.6',
   settings: {
     evmVersion: 'istanbul',
+    optimizer: {
+      enabled: true,
+      runs: 1_000_000,
+    },
+    metadata: {
+      bytecodeHash: 'none',
+    },
+  },
+}
+
+const DEFAULT_8_COMPILER_SETTINGS = {
+  version: '0.8.19',
+  settings: {
     optimizer: {
       enabled: true,
       runs: 1_000_000,
@@ -111,9 +138,20 @@ export default {
   solidity: {
     compilers: [DEFAULT_COMPILER_SETTINGS],
     overrides: {
-      'contracts/PancakeV3Pool.sol': LOWEST_OPTIMIZER_COMPILER_SETTINGS,
-      'contracts/PancakeV3PoolDeployer.sol': LOWEST_OPTIMIZER_COMPILER_SETTINGS,
+      'contracts/PancakeV3Pool.sol': LOWEST_8_OPTIMIZER_COMPILER_SETTINGS,
+      'contracts/PancakeV3PoolDeployer.sol': LOWEST_8_OPTIMIZER_COMPILER_SETTINGS,
       'contracts/test/OutputCodeHash.sol': LOWEST_OPTIMIZER_COMPILER_SETTINGS,
+      'contracts/Pancakev3Factory.sol': DEFAULT_8_COMPILER_SETTINGS,
+      'contracts/SwapFee.sol': DEFAULT_8_COMPILER_SETTINGS,
+      'contracts/v8/libraries/LiquidityMath.sol': DEFAULT_8_COMPILER_SETTINGS,
+      'contracts/v8/libraries/Oracle.sol': DEFAULT_8_COMPILER_SETTINGS,
+      'contracts/v8/libraries/Position.sol': DEFAULT_8_COMPILER_SETTINGS,
+      'contracts/v8/libraries/PRBMath.sol': DEFAULT_8_COMPILER_SETTINGS,
+      'contracts/v8/libraries/SqrtPriceMath.sol': DEFAULT_8_COMPILER_SETTINGS,
+      'contracts/v8/libraries/SwapMath.sol': DEFAULT_8_COMPILER_SETTINGS,
+      'contracts/v8/libraries/Tick.sol': DEFAULT_8_COMPILER_SETTINGS,
+      'contracts/v8/libraries/TickBitmap.sol': DEFAULT_8_COMPILER_SETTINGS,
+      'contracts/v8/libraries/TickMath.sol': DEFAULT_8_COMPILER_SETTINGS,
     },
   },
   watcher: {
