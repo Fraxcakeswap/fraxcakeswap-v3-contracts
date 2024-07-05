@@ -69,6 +69,8 @@ interface IPancakeV3Factory {
         uint24 fee
     ) external view returns (address pool);
 
+    function getSwapFee(address _client, uint24 _fee) external view returns (uint24);
+
     /// @notice Creates a pool for the given two tokens and fee
     /// @param tokenA One of the two tokens in the desired pool
     /// @param tokenB The other of the two tokens in the desired pool

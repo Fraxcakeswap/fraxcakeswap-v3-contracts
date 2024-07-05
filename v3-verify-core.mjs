@@ -16,6 +16,6 @@ if (!network || !networks[network]) {
   throw new Error(`env NETWORK: ${network}`)
 }
 
-await $`yarn workspace @pancakeswap/v3-core run hardhat run scripts/verify_pool.ts --network ${network}`
+await $`yarn workspace @pancakeswap/v3-core run hardhat run scripts/verify.ts --network ${network}`
 
 console.log(chalk.blue('Done!'))

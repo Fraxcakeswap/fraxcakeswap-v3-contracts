@@ -20,7 +20,7 @@ contract MockTimePancakeV3Pool is PancakeV3Pool {
         time += by;
     }
 
-    function _blockTimestamp() internal view override returns (uint32) {
-        return uint32(time);
-    }
+    // function _blockTimestamp() internal view override returns (uint32) {
+    //     return uint32(time);
+    // }
 }

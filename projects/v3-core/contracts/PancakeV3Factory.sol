@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-pragma solidity ^0.8.19;
+pragma solidity =0.7.6;
 
-import './v8/interfaces/IPancakeV3Factory.sol';
-import "./v8/interfaces/IPancakeV3PoolDeployer.sol";
-import './v8/interfaces/IPancakeV3Pool.sol';
-import './v8/interfaces/ISwapFee.sol';
+import './interfaces/IPancakeV3Factory.sol';
+import "./interfaces/IPancakeV3PoolDeployer.sol";
+import './interfaces/IPancakeV3Pool.sol';
+import './interfaces/ISwapFee.sol';
 
 /// @title Canonical PancakeSwap V3 factory
 /// @notice Deploys PancakeSwap V3 pools and manages ownership and control over pool protocol fees
@@ -12,9 +12,9 @@ contract PancakeV3Factory is IPancakeV3Factory {
     /// @inheritdoc IPancakeV3Factory
     address public override owner;
 
-    address public poolDeployer;
+    address public immutable poolDeployer;
 
-    address private _swapFee;
+    address public swapFee; 
 
     /// @inheritdoc IPancakeV3Factory
     mapping(uint24 => int24) public override feeAmountTickSpacing;
@@ -25,8 +25,6 @@ contract PancakeV3Factory is IPancakeV3Factory {
     mapping(address => bool) private _whiteListAddresses;
 
     address public lmPoolDeployer;
-
-    event SetPoolDeployer(address indexed poolDeployer);
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Not owner");
@@ -59,6 +57,18 @@ contract PancakeV3Factory is IPancakeV3Factory {
         feeAmountTickSpacingExtraInfo[10000] = TickSpacingExtraInfo({whitelistRequested: false, enabled: true});
         emit FeeAmountEnabled(10000, 200);
         emit FeeAmountExtraInfoUpdated(10000, false, true);
+    }
+
+    function setSwapFee(address _swapFee) external onlyOwner {
+        swapFee = _swapFee;
+    }
+
+    function getSwapFee(address _client, uint24 _fee) external view override returns (uint24) {
+        if(swapFee == address(0)) {
+            return _fee;
+        }
+
+        return ISwapFee(swapFee).swapFee(_client, _fee);
     }
 
     /// @inheritdoc IPancakeV3Factory
@@ -131,23 +141,6 @@ contract PancakeV3Factory is IPancakeV3Factory {
     function setLmPoolDeployer(address _lmPoolDeployer) external override onlyOwner {
         lmPoolDeployer = _lmPoolDeployer;
         emit SetLmPoolDeployer(_lmPoolDeployer);
-    }
-
-    function setPoolDeployer(address _poolDeployer) external onlyOwner {
-        poolDeployer = _poolDeployer;
-        emit SetPoolDeployer(_poolDeployer);
-    }
-
-    function setSwapFee(address swapFee) external onlyOwner {
-        _swapFee = swapFee;
-    }
-
-    function getSwapFee(address sender, uint24 fee) external returns (uint24) {       
-        if(_swapFee == address(0)) {
-            return fee;
-        }
-
-        return ISwapFee(_swapFee).swapFee(sender, fee);
     }
 
     function setFeeProtocol(address pool, uint32 feeProtocol0, uint32 feeProtocol1) external override onlyOwner {

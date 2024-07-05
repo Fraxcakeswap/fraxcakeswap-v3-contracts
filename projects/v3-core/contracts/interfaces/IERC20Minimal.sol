@@ -15,6 +15,8 @@ interface IERC20Minimal {
     /// @return Returns true for a successful transfer, false for an unsuccessful transfer
     function transfer(address recipient, uint256 amount) external returns (bool);
 
+    function totalSupply() external view returns (uint256);
+
     /// @notice Returns the current allowance given to a spender by an owner
     /// @param owner The account of the token owner
     /// @param spender The account of the token spender

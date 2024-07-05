@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-pragma solidity ^0.8.19;
+pragma solidity =0.7.6;
 
-import './v8/interfaces/IPancakeV3PoolDeployer.sol';
+import './interfaces/IPancakeV3PoolDeployer.sol';
 
 import './PancakeV3Pool.sol';
 
@@ -14,20 +14,25 @@ contract PancakeV3PoolDeployer is IPancakeV3PoolDeployer {
         int24 tickSpacing;
     }
 
-    error NotFactory();
-    error AlreadyInitialized();
-
     /// @inheritdoc IPancakeV3PoolDeployer
     Parameters public override parameters;
 
     address public factoryAddress;
 
+    /// @notice Emitted when factory address is set
+    event SetFactoryAddress(address indexed factory);
+
+    modifier onlyFactory() {
+        require(msg.sender == factoryAddress, "only factory can call deploy");
+        _;
+    }
+
     function setFactoryAddress(address _factoryAddress) external {
-        if (factoryAddress != address(0)) {
-            revert AlreadyInitialized();
-        }
+        require(factoryAddress == address(0), "already initialized");
 
         factoryAddress = _factoryAddress;
+
+        emit SetFactoryAddress(_factoryAddress);
     }
 
     /// @dev Deploys a pool with the given parameters by transiently setting the parameters storage slot and then
@@ -43,11 +48,7 @@ contract PancakeV3PoolDeployer is IPancakeV3PoolDeployer {
         address token1,
         uint24 fee,
         int24 tickSpacing
-    ) external override returns (address pool) {
-        if (msg.sender != factoryAddress) {
-            revert NotFactory();
-        }
-
+    ) external override onlyFactory returns (address pool) {
         parameters = Parameters({factory: factory, token0: token0, token1: token1, fee: fee, tickSpacing: tickSpacing});
         pool = address(new PancakeV3Pool{salt: keccak256(abi.encode(token0, token1, fee))}());
         delete parameters;

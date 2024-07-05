@@ -7,6 +7,8 @@ contract TestERC20 is IERC20Minimal {
     mapping(address => uint256) public override balanceOf;
     mapping(address => mapping(address => uint256)) public override allowance;
 
+    uint256 public override totalSupply;
+
     constructor(uint256 amountToMint) {
         mint(msg.sender, amountToMint);
     }
@@ -15,6 +17,7 @@ contract TestERC20 is IERC20Minimal {
         uint256 balanceNext = balanceOf[to] + amount;
         require(balanceNext >= amount, 'overflow balance');
         balanceOf[to] = balanceNext;
+        totalSupply++;
     }
 
     function transfer(address recipient, uint256 amount) external override returns (bool) {
